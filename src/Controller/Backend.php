@@ -32,6 +32,7 @@ class Backend extends AbstractController {
             $login->setUsername($username);
             $login->setPassword($password);
             $login->setAcctype($acctype);
+            $login->setStatus('active');
 
             $entityManager->persist($login);
 

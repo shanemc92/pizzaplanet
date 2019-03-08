@@ -4,9 +4,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Multi-page template</title>
-
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+	<title>PizzaPlanet</title>
+	
+	<link rel="stylesheet" href="/assets/css/themes/pizza.min.css" />
+	<link rel="stylesheet" href="/assets/css/themes/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
@@ -15,7 +17,10 @@
 	<!-- Start of first page: #one -->
 	<div data-role="page" id="one">
 		<div data-role="header">
-			<h1>Multi-page</h1>
+			<!-- <h1>Out of this World Pizza</h1>-->
+			<br>
+			<center><img src="/assets/img/logo3.png" height="80px"></center>
+			<br>
 		</div><!-- /header -->
 
 		<div role="main" class="ui-content">
@@ -93,7 +98,16 @@
 			<h2>Register</h2>
 			Username <input type="text" name="username" id="username" value="">
 			Password <input type="text" name="pass" id="pass" value="">
-			AccType <input type="text" name="acctype" id="acctype" value="">
+			<!--AccType <input type="text" name="acctype" id="acctype" value="">-->
+			<div class="ui-field-contain">
+			    Account Type
+			    <select name="select-custom-21" id="acctype" data-native-menu="false">
+			        <option value="choose-one" data-placeholder="true">Please select...</option>
+			        <option value="customer">Customer</option>
+			        <option value="driver">Driver</option>
+			        <option value="manager">Manager</option>
+			    </select>
+			</div>
 			<button class="ui-btn" id="registerButton">Submit</button>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back</a></p>
 		</div><!-- /content -->
