@@ -152,19 +152,23 @@
 		</div><!-- /header -->
 		<div role="main" class="ui-content">
 			<h2>Register</h2>
-			Username <input type="text" name="username" id="username" value="">
-			Password <input type="text" name="pass" id="pass" value="">
-			<!--AccType <input type="text" name="acctype" id="acctype" value="">-->
-			<div class="ui-field-contain">
-			    Account Type
-			    <select name="select-custom-21" id="acctype" data-native-menu="false">
-			        <option value="choose-one" data-placeholder="true">Please select...</option>
-			        <option value="customer">Customer</option>
-			        <option value="driver">Driver</option>
-			        <option value="manager">Manager</option>
-			    </select>
-			</div>
-			<button class="ui-btn" id="registerButton">Submit</button>
+			<form id="myform">
+				<div id="error"></div>
+				Email <input type="text" name="email" id="email" value="">
+				Password <input type="password" name="password" id="password" value="">
+				Confirm Password <input type="password" name="password2" id="password2" value="">
+				<!--AccType <input type="text" name="acctype" id="acctype" value="">-->
+				<div class="ui-field-contain">
+				    Account Type
+				    <select name="select-custom-21" id="acctype" data-native-menu="false">
+				        <option value="choose-one" data-placeholder="true">Please select...</option>
+				        <option value="customer">Customer</option>
+				        <option value="driver">Driver</option>
+				        <option value="manager">Manager</option>
+				    </select>
+				</div>
+				<button class="ui-btn" id="registerButton">Submit</button>
+			</form>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back</a></p>
 		</div><!-- /content -->
 	</div>
@@ -172,106 +176,162 @@
 </body>
 
 <script>
+	var formValid = false;
 
-$("#completeOrder").click(function(){
+	function validateElements(){
+		// check email is entered
+		var error = "";
+		// regex pattern
+		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-	var order =  $("#orderContent").html();
+		if($("#email").val() == ""){ // not valid
+			error = error + "Please enter an email address.<br>";
+			$("#error").html(error);
+			return false;
+		}
+		else if(re.test(String($("#email").val()).toLowerCase()) !== true){ // incorrect email
+			error = error + "Email not valid.<br>";
+			$("#error").html(error);
+			return false;
+		}
+		else if($("#password").val() == ""){ // not valid
+			error = error + "Please enter a password.<br>";
+			$("#error").html(error);
+			return false;
+		} 
+		else if($("#password2").val() == ""){ //not valid
+			error = error + "Please confirm your password.<br>";
+			$("#error").html(error);
+			return false;
+		}
+		else if($("#password2").val() !== $("#password").val()){ //not valid
+			error = error + "Passwords do not match.<br>";
+			$("#error").html(error);
+			return false;
+		}
+		else if($("#password").val().length < 8){ //too short
+			error = error + "Password too short.<br>";
+			$("#error").html(error);
+			return false;
+		}
+		else {
+			formValid = true;
+			return true;
+		}
+	}
 
-	alert(order);
-});
+	$("#myform").click(function(){
+		validateElements();
+	});
 
-$("#goBack").click(function(){
-	$("#orderOptions").show();
-	$("#orderDetails").hide();
-})
 
-$("#placeOrder").click(function(){
 
-	$("#orderOptions").hide();
-	$("#orderDetails").show();
+	$("#completeOrder").click(function(){
+		var order =  $("#orderContent").html();
+		alert(order);
+	});
 
-	var content = '<h2>Your Order:</h2><br><b>Pizza Topping:</b><br>';
+	$("#goBack").click(function(){
+		$("#orderOptions").show();
+		$("#orderDetails").hide();
+	})
 
-	var comments = $("#comments").val();
-	
-	var pizza = $("input[name='pizza']").each(function(){
-		if(this.checked == true){
-			content = content + this.value + ":" + this.checked + "<br>";
+	$("#placeOrder").click(function(){
+
+		$("#orderOptions").hide();
+		$("#orderContent").show();
+		$("#orderDetails").show();
+
+		var content = '<h2>Your Order:</h2><br><b>Pizza Topping:</b><br>';
+		
+		var comments = $("#comments").val();
+		
+		var pizza = $("input[name='pizza']").each(function(){
+			if(this.checked == true){
+				content = content + this.value + ":" + this.checked + "<br>";
+			}
+		});
+
+		var username = '';
+    
+	    $.post( "/backend", {type: "getusername"})
+	      .done(function(data){
+	        username = data; // whatever data comes back, store it in the username variable
+			content = content + "<br><b>Additional Order Comments:</b><br>";
+			content = content + comments + "<br>";
+			content = content + "Thank you for your order " + username;
+			
+			$("#orderContent").html(content);
+		})
+	});
+
+
+	$("#loginButton").click(function(){
+
+		var un = $("#login_username").val();
+		console.log(un);
+
+		var pw = $("#login_pass").val();
+		console.log(pw);
+
+		$.post( "/backend", { type: "login", username:un, password:pw})
+		.done(function( data ) {
+		alert( "Data Loaded: " + data );
+
+		if(data == 'customer'){
+			window.location="/index#customer";
+			
+		}
+		else if(data == 'driver'){
+			window.location="/index#driver";
+		}
+		else if (data == 'manager'){
+			window.location="/index#manager";
+		} 
+		else{
+			alert( "Undefined: " + data );
+		}        
+
+		});
+	  
+	  //alert( "login button pressed!" );
+	  
+	});
+
+	$("#registerButton").click(function(){
+		validateElements();
+
+		if (formValid == true){
+			var un = $("#email").val();
+			console.log(un);
+
+			var pw = $("#password").val();
+			console.log(pw);
+
+			var at = $("#acctype").val();
+			console.log(at);
+
+			$.post("/backend", { type: "register", username:un, password:pw, acctype:at})
+			.done(function(data){
+				alert("Data Loaded: " + data);
+
+				if(data == 'customer'){
+					window.location="/index#customer";
+				}
+				else if(data == 'driver'){
+					window.location="/index#driver";
+				}
+				else if (data == 'manager'){
+					window.location="/index#manager";
+				} 
+				else{
+					alert("Undefined: " + data);
+				}
+			}) 
+		} else {
+			alert('Issue with validation');
 		}
 	});
-
-	content = content + "<br><b>Additional Order Comments:</b><br>";
-	content = content + comments + "<br>";
-	
-	$("#orderContent").html(content);
-});
-
-
-$("#loginButton").click(function(){
-
-	var un = $("#login_username").val();
-	console.log(un);
-
-	var pw = $("#login_pass").val();
-	console.log(pw);
-
-	$.post( "/backend", { type: "login", username:un, password:pw})
-	.done(function( data ) {
-	alert( "Data Loaded: " + data );
-
-	if(data == 'customer'){
-		window.location="/index#customer";
-		
-	}
-	else if(data == 'driver'){
-		window.location="/index#driver";
-	}
-	else if (data == 'manager'){
-		window.location="/index#manager";
-	} 
-	else{
-		alert( "Undefined: " + data );
-	}        
-
-	});
-  
-  //alert( "login button pressed!" );
-  
-});
-
-$("#registerButton").click(function(){
-
-	var un = $("#username").val();
-	console.log(un);
-
-	var pw = $("#pass").val();
-	console.log(pw);
-
-	var at = $("#acctype").val();
-	console.log(at);
-
-	$.post( "/backend", { type: "register", username:un, password:pw, acctype:at})
-	.done(function( data ) {
-	alert( "Data Loaded: " + data );
-
-	if(data == 'customer'){
-		window.location="/index#customer";
-	}
-	else if(data == 'driver'){
-		window.location="/index#driver";
-	}
-	else if (data == 'manager'){
-		window.location="/index#manager";
-	} 
-	else{
-		alert( "Undefined: " + data );
-	}       
-
-});
-  
-  //alert( "register button pressed!" );
-  
-});
 
 </script>
 
