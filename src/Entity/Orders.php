@@ -77,4 +77,11 @@ class Orders
 
         return $this;
     }
+	
+	public function getCreated(): ?string
+    {
+        return $this->created;
+    }
+
+
 }

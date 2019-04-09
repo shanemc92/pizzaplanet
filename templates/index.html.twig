@@ -223,7 +223,40 @@
 	$(document).ready(function(){
 		$("#orderDetails").hide();
 		$("#toppings").hide();
-	});
+
+		// template for a product
+		class product {
+		  	constructor(item, price, qty) {
+			    this.item = item;
+			    this.price = price;
+			    this.qty = qty;
+			}
+		}
+
+		// define our products
+		hawaiian_s = new product("hawaiian-s", 5, 0);
+		hawaiian_m = new product("hawaiian-m", 10, 0);
+		hawaiian_l = new product("hawaiian-l", 11, 0);
+		newyork_s = new product("newyork-s", 5, 0);
+		newyork_m = new product("newyork-m", 10, 0);
+		newyork_l = new product("newyork-l", 11, 0);
+		meatfeast_s = new product("meatfeast-s", 5, 0);
+		meatfeast_m = new product("meatfeast-m", 10, 0);
+		meatfeast_l = new product("meatfeast-l", 11, 0);
+		custom_s = new product("custom-s", 5, 0);
+		custom_m = new product("custom-m", 10, 0);
+		custom_l = new product("custom-l", 11, 0);
+		topping = new product("topping", 1, 0);
+		garlicbread = new product("garlicbread", 5, 0);
+		wedges = new product("wedges", 5, 0);
+		coke = new product("coke", 1, 0);
+		coke = new product("coke", 1, 0);
+
+		var prod = [];
+		prod.push(cookies);
+		prod.push(pizza);
+
+	})
 
 	var formValid = false;
 
@@ -274,16 +307,12 @@
 	});
 
 
-    $("select.country").change(function(){
-        var selectedCountry = $(this).children("option:selected").val();
+    $("select.toppingselect").change(function(){
+        var selectedCountry = $(this).children("option:toppingselect").val();
         alert("You have selected the country - " + selectedCountry);
     });
 
 	$('[id=addOrder').click(function(){
-	    var p = $(this).attr('productname'); // find out what was clicked
-	    var arrayLength = prod.length;
-	    for (var i = 0; i < arrayLength; i++) { // loop over the products 
-	        var pro = prod[i] // get one product at a time
 	        console.log(pro.name);
 	        if(p == pro.name) { // check if the product we are looking for is the one we have.
 	            console.log(pro.qty);
@@ -291,7 +320,7 @@
 	            $( "#"+pro.name+"Qty" ).val(pro.qty); // if we looking for cookies, pro.name+Qty becomes, cookiesQty
 	        }
 	        //Do something
-	    }
+	    
 	});
 	
 	$("input[id=pizza1]").click(function(){
