@@ -49,18 +49,62 @@
 		</div><!-- /header -->
 		<div role="main" class="ui-content">
 			<div id="orderOptions">
-				<h2>Two</h2>
+				<h2>Menu</h2>
+				<h3>Pizza</h3>
 				<fieldset data-role="controlgroup">
-			        <legend>Toppings:</legend>
-			        <input type="radio" name="pizza" id="radio-choice-v-2a" value="Bacon" checked="checked">
-			        <label for="radio-choice-v-2a">Bacon</label>
-			        <input type="radio" name="pizza" id="radio-choice-v-2b" value="Chicken">
-			        <label for="radio-choice-v-2b">Chicken</label>
-			        <input type="radio" name="pizza" id="radio-choice-v-2c" value="Pepperoni">
-			        <label for="radio-choice-v-2c">Pepperoni</label>
+			        <input type="radio" name="pizza" id="pizza2" value="Hawaiian" checked>
+			        <label for="pizza2">Hawaiian</label>
+			        <input type="radio" name="pizza" id="pizza3" value="New Yorker">
+			        <label for="pizza3">New Yorker</label>
+			        <input type="radio" name="pizza" id="pizza4" value="House Special">
+			        <label for="pizza4">House Special</label>
+			        <input type="radio" name="pizza" id="pizza1" value="Custom">
+			        <label for="pizza1">Custom (Choose Toppings Below)</label>
 	    		</fieldset>
-	    		<label for="textarea-1">Comments</label>
-	    		<textarea name="textarea-1" id="comments"></textarea>
+
+	    		<div id="toppings">
+					<select name="toppingselect" id="toppingselect" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+						<label for="toppingselect" class="select">Toppings</label>
+					    <option>Toppings</option>
+					    <optgroup label="All Toppings €1 Each">
+					        <option value="ham">Ham</option>
+					        <option value="chicken">Chicken</option>
+					        <option value="pepperoni">Pepperoni</option>
+					        <option value="sweetcorn">Sweetcorn</option>
+					        <option value="tomato">Tomato</option>
+					        <option value="peppers">Peppers</option>
+					        <option value="bacon">Bacon</option>
+					    </optgroup>
+					</select>
+				</div>
+				<fieldset data-role="controlgroup" data-type="horizontal" >
+    				<legend>Size of Pizza:</legend>
+			        <input type="radio" name="size" id="size1" value="small" checked>
+			        <label for="size1">Small - €5</label>
+			        <input type="radio" name="size" id="size2" value="medium">
+			        <label for="size2">Medium - €10</label>
+			        <input type="radio" name="size" id="size3" value="large">
+			        <label for="size3">Large - €11</label>
+				</fieldset>
+
+				<button id="addOrder">Add to Order</button>
+				
+				<h3>Sides - €5 Each</h3>
+				<label for="side1">Garlic Bread</label>
+				<input type="range" name="GarlicBread" id="side1" value="0" min="0" max="10">
+				<label for="side2">Potato Wedges</label>
+				<input type="range" name="PotatoWedges" id="side2" value="0" min="0" max="10">
+				<h3>Drinks - €1 Each</h3>
+				<label for="drink1">Coke 330ml</label>
+				<input type="range" name="Coke" id="drink1" value="0" min="0" max="10">
+				<label for="drink2">Fanta 330ml</label>
+				<input type="range" name="Fanta" id="drink2" value="0" min="0" max="10">
+				<label for="drink3">Sprite 330ml</label>
+				<input type="range" name="Sprite" id="drink3" value="0" min="0" max="10">
+				<button id="updateOrder">Update Order</button>
+
+	    		<label for="comments">Comments</label>
+	    		<textarea name="comments" id="comments"></textarea>
 				<button id="placeOrder">Place Order</button>
 				<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
 			</div>
@@ -176,6 +220,11 @@
 </body>
 
 <script>
+	$(document).ready(function(){
+		$("#orderDetails").hide();
+		$("#toppings").hide();
+	});
+
 	var formValid = false;
 
 	function validateElements(){
@@ -225,6 +274,43 @@
 	});
 
 
+    $("select.country").change(function(){
+        var selectedCountry = $(this).children("option:selected").val();
+        alert("You have selected the country - " + selectedCountry);
+    });
+
+	$('[id=addOrder').click(function(){
+	    var p = $(this).attr('productname'); // find out what was clicked
+	    var arrayLength = prod.length;
+	    for (var i = 0; i < arrayLength; i++) { // loop over the products 
+	        var pro = prod[i] // get one product at a time
+	        console.log(pro.name);
+	        if(p == pro.name) { // check if the product we are looking for is the one we have.
+	            console.log(pro.qty);
+	            pro.qty = pro.qty + 1; // add one onto the qty
+	            $( "#"+pro.name+"Qty" ).val(pro.qty); // if we looking for cookies, pro.name+Qty becomes, cookiesQty
+	        }
+	        //Do something
+	    }
+	});
+	
+	$("input[id=pizza1]").click(function(){
+		//alert("clicked");
+		$('input[id^=topping]').prop('checked', false);
+		$("#toppings").show();
+	});
+	$("input[id=pizza2]").click(function(){
+		//alert("clicked");
+		$("#toppings").hide();
+	});
+	$("input[id=pizza3]").click(function(){
+		//alert("clicked");
+		$("#toppings").hide();
+	});
+	$("input[id=pizza4]").click(function(){
+		//alert("clicked");
+		$("#toppings").hide();
+	});
 
 	$("#completeOrder").click(function(){
 		var order =  $("#orderContent").html();
