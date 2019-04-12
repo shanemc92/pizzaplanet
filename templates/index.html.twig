@@ -91,16 +91,16 @@
 				
 				<h3>Sides - €5 Each</h3>
 				<label for="side1">Garlic Bread</label>
-				<input type="range" name="GarlicBread" id="side1" value="0" min="0" max="10">
+				<input type="range" name="GarlicBread" id="GarlicBread" value="0" min="0" max="10">
 				<label for="side2">Potato Wedges</label>
-				<input type="range" name="PotatoWedges" id="side2" value="0" min="0" max="10">
+				<input type="range" name="PotatoWedges" id="PotatoWedges" value="0" min="0" max="10">
 				<h3>Drinks - €1 Each</h3>
 				<label for="drink1">Coke 330ml</label>
-				<input type="range" name="Coke" id="drink1" value="0" min="0" max="10">
+				<input type="range" name="Coke" id="Coke" value="0" min="0" max="10">
 				<label for="drink2">Fanta 330ml</label>
-				<input type="range" name="Fanta" id="drink2" value="0" min="0" max="10">
+				<input type="range" name="Fanta" id="Fanta" value="0" min="0" max="10">
 				<label for="drink3">Sprite 330ml</label>
-				<input type="range" name="Sprite" id="drink3" value="0" min="0" max="10">
+				<input type="range" name="Sprite" id="Sprite" value="0" min="0" max="10">
 				<button id="updateOrder">Update Order</button>
 
 	    		<label for="comments">Comments</label>
@@ -112,7 +112,7 @@
 			<div id="orderDetails">
 				<div id="orderContent"></div>
 				<button id='goBack'>Go back to options</button>
-				<button id='completeOrder'>Complete Order</button>
+				<button id='btnGet'>Complete Order</button>
 			</div>
 
 		</div><!-- /content -->
@@ -226,36 +226,35 @@
 
 		// template for a product
 		class product {
-		  	constructor(item, price, qty) {
+		  	constructor(item, detail, price, qty) {
 			    this.item = item;
+			    this.detail = detail;
 			    this.price = price;
 			    this.qty = qty;
 			}
 		}
 
 		// define our products
-		hawaiian_s = new product("hawaiian-s", 5, 0);
-		hawaiian_m = new product("hawaiian-m", 10, 0);
-		hawaiian_l = new product("hawaiian-l", 11, 0);
-		newyork_s = new product("newyork-s", 5, 0);
-		newyork_m = new product("newyork-m", 10, 0);
-		newyork_l = new product("newyork-l", 11, 0);
-		meatfeast_s = new product("meatfeast-s", 5, 0);
-		meatfeast_m = new product("meatfeast-m", 10, 0);
-		meatfeast_l = new product("meatfeast-l", 11, 0);
-		custom_s = new product("custom-s", 5, 0);
-		custom_m = new product("custom-m", 10, 0);
-		custom_l = new product("custom-l", 11, 0);
-		topping = new product("topping", 1, 0);
-		garlicbread = new product("garlicbread", 5, 0);
-		wedges = new product("wedges", 5, 0);
-		coke = new product("coke", 1, 0);
-		coke = new product("coke", 1, 0);
+		hawaiian_s = new product("hawaiian-s", "", 5, 0);
+		hawaiian_m = new product("hawaiian-m", "", 10, 0);
+		hawaiian_l = new product("hawaiian-l", "", 11, 0);
+		newyork_s = new product("newyork-s", "", 5, 0);
+		newyork_m = new product("newyork-m", "", 10, 0);
+		newyork_l = new product("newyork-l", "", 11, 0);
+		meatfeast_s = new product("meatfeast-s", "", 5, 0);
+		meatfeast_m = new product("meatfeast-m", "", 10, 0);
+		meatfeast_l = new product("meatfeast-l", "", 11, 0);
+		custom_s = new product("custom-s", "", 5, 0);
+		custom_m = new product("custom-m", "", 10, 0);
+		custom_l = new product("custom-l", "", 11, 0);
+		topping = new product("topping", "", 1, 0);
+		garlicbread = new product("garlicbread", "", 5, 0);
+		wedges = new product("wedges", "", 5, 0);
+		coke = new product("coke", "", 1, 0);
 
-		var prod = [];
-		prod.push(cookies);
-		prod.push(pizza);
-
+		var cart = [];
+		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, meatfeast_l, meatfeast_m, meatfeast_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke);
+		console.log(cart);
 	})
 
 	var formValid = false;
@@ -313,16 +312,37 @@
     });
 
 	$('[id=addOrder').click(function(){
-	        console.log(pro.name);
-	        if(p == pro.name) { // check if the product we are looking for is the one we have.
-	            console.log(pro.qty);
-	            pro.qty = pro.qty + 1; // add one onto the qty
-	            $( "#"+pro.name+"Qty" ).val(pro.qty); // if we looking for cookies, pro.name+Qty becomes, cookiesQty
-	        }
-	        //Do something
-	    
+		console.log($("#comments").val());
+        console.log($("input:radio[name=pizza]:checked").val());
+        console.log($("input:radio[name=size]:checked").val());
+        console.log($("#GarlicBread").val());
+        console.log($("#PotatoWedges").val());
+        console.log($("#Coke").val());
+        console.log($("#Fanta").val());
+        console.log($("#Sprite").val());
+        $('#toppingselect :selected').each(function(i, sel){ 
+    		console.log($(sel).val()); 
+		});
+
+		
 	});
 	
+	
+	$("#btnGet").click(function () {
+    // first get the multiple selected checkbox items
+    var chk = [];
+    $("input:checkbox:checked").each(function() {
+        chk.push($(this).val());
+    });
+
+    $("#para").html(
+        $("#txtBox").val() + "<br/>" +
+        $("input:radio[name=rad]:checked").val() + "<br/>" +
+        chk.join(",") + "<br/>" +
+        $("#selectbox").val()
+        );
+});
+
 	$("input[id=pizza1]").click(function(){
 		//alert("clicked");
 		$('input[id^=topping]').prop('checked', false);
