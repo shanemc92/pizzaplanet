@@ -43,6 +43,7 @@
 
 		<div data-role="panel" data-position="right" id="orderDetails" data-display="overlay">
 				<div id="orderContent"></div>
+				<div id="error"></div>
 				<button id='placeOrder'>Complete Order</button>
 				<a href="#" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left" data-rel="close">Close</a>
    			 <!-- panel content goes here -->
@@ -60,11 +61,11 @@
 				<h3>Pizza</h3>
 				<fieldset data-role="controlgroup">
 			        <input type="radio" name="pizza" id="pizza2" value="hawaiian" checked>
-			        <label for="pizza2">Hawaiian</label>
+			        <label for="pizza2">Hawaiian (Pineapple and Ham)</label>
 			        <input type="radio" name="pizza" id="pizza3" value="newyork">
-			        <label for="pizza3">New Yorker</label>
+			        <label for="pizza3">New Yorker (Pepperoni)</label>
 			        <input type="radio" name="pizza" id="pizza4" value="housespecial">
-			        <label for="pizza4">House Special</label>
+			        <label for="pizza4">House Special (Chicken, Sweetcorn, Bacon)</label>
 			        <input type="radio" name="pizza" id="pizza1" value="custom">
 			        <label for="pizza1">Custom (Choose Toppings Below)</label>
 	    		</fieldset>
@@ -341,7 +342,7 @@
 	            b.detail = b.detail + topp;
 	        }
 	    }
-	    console.log(cart);
+	    //console.log(cart);
 		
 	});
 	
@@ -356,23 +357,31 @@
         fanta.qty = $("#Fanta").val();
         sprite.qty = $("#Sprite").val();
         comm.detail = $("#comments").val();
-        
-        console.log(cart);
+        //console.log(cart);
 	}
 
 	$("#placeOrder").click(function(){
-		addr.detail = $("#address").val();
-		console.log(cart);
-		order = JSON.stringify(cart);
-		$.post( "/backend", {type: "placeOrder", details:order})
-	      .done(function(data){
-	        var content = '<h2>Your Order:</h2>';
-			content = content + "<br><b>Your order has been placed!</b><br><br>";
-			$("#placeOrder").hide();
-			$("#orderContent").html(content);
-			$("#orderDetails").trigger("updatelayout");
-		})
-	    console.log(order);
+		if($("#address").val().length < 20){ //too short
+			error = "<span>Address too short.</span><br>";
+			$("#error").html(error);
+			return false;
+		}
+		else{
+			error = "";
+			$("#error").html(error);
+			addr.detail = $("#address").val();
+			//console.log(cart);
+			order = JSON.stringify(cart);
+			$.post( "/backend", {type: "placeOrder", details:order})
+		      .done(function(data){
+		        var content = '<h2>Your Order:</h2>';
+				content = content + "<br><b>Your order has been placed!</b><br><br>";
+				$("#placeOrder").hide();
+				$("#orderContent").html(content);
+				$("#orderDetails").trigger("updatelayout");
+			})
+	    	//console.log(order);
+		}
 	});
 
 	$("#resetOrder").click(function(){
@@ -383,7 +392,7 @@
 	        b.detail = "";
 	    }
 	    $(".slide").val(0).slider("refresh");
-	    console.log(cart);
+	    //console.log(cart);
 	});
 
 
