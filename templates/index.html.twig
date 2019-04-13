@@ -41,6 +41,13 @@
 	<!-- Start of page: #customer -->
 	<div data-role="page" id="customer" data-theme="a">
 
+		<div data-role="panel" data-position="right" id="orderDetails" data-display="overlay">
+				<div id="orderContent"></div>
+				<button id='btnGet'>Complete Order</button>
+				<a href="#" data-rel="close">Close panel</a>
+   			 <!-- panel content goes here -->
+			</div><!-- /panel -->
+
 		<div data-role="header">
 			<br>
 			<center><img src="/assets/img/logo3.png" width="40%"></center>
@@ -52,38 +59,38 @@
 				<h2>Menu</h2>
 				<h3>Pizza</h3>
 				<fieldset data-role="controlgroup">
-			        <input type="radio" name="pizza" id="pizza2" value="Hawaiian" checked>
+			        <input type="radio" name="pizza" id="pizza2" value="hawaiian" checked>
 			        <label for="pizza2">Hawaiian</label>
-			        <input type="radio" name="pizza" id="pizza3" value="New Yorker">
+			        <input type="radio" name="pizza" id="pizza3" value="newyork">
 			        <label for="pizza3">New Yorker</label>
-			        <input type="radio" name="pizza" id="pizza4" value="House Special">
+			        <input type="radio" name="pizza" id="pizza4" value="housespecial">
 			        <label for="pizza4">House Special</label>
-			        <input type="radio" name="pizza" id="pizza1" value="Custom">
+			        <input type="radio" name="pizza" id="pizza1" value="custom">
 			        <label for="pizza1">Custom (Choose Toppings Below)</label>
 	    		</fieldset>
 
 	    		<div id="toppings">
 					<select name="toppingselect" id="toppingselect" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
 						<label for="toppingselect" class="select">Toppings</label>
-					    <option>Toppings</option>
+					    <option>Additional Toppings</option>
 					    <optgroup label="All Toppings €1 Each">
-					        <option value="ham">Ham</option>
-					        <option value="chicken">Chicken</option>
-					        <option value="pepperoni">Pepperoni</option>
-					        <option value="sweetcorn">Sweetcorn</option>
-					        <option value="tomato">Tomato</option>
-					        <option value="peppers">Peppers</option>
-					        <option value="bacon">Bacon</option>
+					        <option value="Ham">Ham</option>
+					        <option value="Chicken">Chicken</option>
+					        <option value="Pepperoni">Pepperoni</option>
+					        <option value="Sweetcorn">Sweetcorn</option>
+					        <option value="Tomato">Tomato</option>
+					        <option value="Peppers">Peppers</option>
+					        <option value="Bacon">Bacon</option>
 					    </optgroup>
 					</select>
 				</div>
 				<fieldset data-role="controlgroup" data-type="horizontal" >
     				<legend>Size of Pizza:</legend>
-			        <input type="radio" name="size" id="size1" value="small" checked>
+			        <input type="radio" name="size" id="size1" value="_s" checked>
 			        <label for="size1">Small - €5</label>
-			        <input type="radio" name="size" id="size2" value="medium">
+			        <input type="radio" name="size" id="size2" value="_m">
 			        <label for="size2">Medium - €10</label>
-			        <input type="radio" name="size" id="size3" value="large">
+			        <input type="radio" name="size" id="size3" value="_l">
 			        <label for="size3">Large - €11</label>
 				</fieldset>
 
@@ -107,13 +114,10 @@
 	    		<textarea name="comments" id="comments"></textarea>
 				<button id="placeOrder">Place Order</button>
 				<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
+				<button id="resetOrder">Reset Order</button>
 			</div>
 
-			<div id="orderDetails">
-				<div id="orderContent"></div>
-				<button id='goBack'>Go back to options</button>
-				<button id='btnGet'>Complete Order</button>
-			</div>
+			
 
 		</div><!-- /content -->
 	
@@ -180,7 +184,7 @@
 	    <div role="main" class="ui-content">
 			<h2>Login</h2>
 			Username <input type="text" name="login_username" id="login_username" value="">
-			Password <input type="text" name="login_pass" id="login_pass" value="">
+			Password <input type="password" name="login_pass" id="login_pass" value="">
 			<button class="ui-btn" id="loginButton">Submit</button>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back</a></p>
 		</div><!-- /content -->
@@ -220,41 +224,46 @@
 </body>
 
 <script>
-	$(document).ready(function(){
-		$("#orderDetails").hide();
-		$("#toppings").hide();
 
-		// template for a product
+	// template for a product
 		class product {
-		  	constructor(item, detail, price, qty) {
+		  	constructor(item, detail, ptype, pname, price, qty) {
 			    this.item = item;
 			    this.detail = detail;
+			    this.ptype = ptype;
+			    this.pname = pname;
 			    this.price = price;
 			    this.qty = qty;
 			}
 		}
 
 		// define our products
-		hawaiian_s = new product("hawaiian-s", "", 5, 0);
-		hawaiian_m = new product("hawaiian-m", "", 10, 0);
-		hawaiian_l = new product("hawaiian-l", "", 11, 0);
-		newyork_s = new product("newyork-s", "", 5, 0);
-		newyork_m = new product("newyork-m", "", 10, 0);
-		newyork_l = new product("newyork-l", "", 11, 0);
-		meatfeast_s = new product("meatfeast-s", "", 5, 0);
-		meatfeast_m = new product("meatfeast-m", "", 10, 0);
-		meatfeast_l = new product("meatfeast-l", "", 11, 0);
-		custom_s = new product("custom-s", "", 5, 0);
-		custom_m = new product("custom-m", "", 10, 0);
-		custom_l = new product("custom-l", "", 11, 0);
-		topping = new product("topping", "", 1, 0);
-		garlicbread = new product("garlicbread", "", 5, 0);
-		wedges = new product("wedges", "", 5, 0);
-		coke = new product("coke", "", 1, 0);
+		hawaiian_s = new product("hawaiian_s", "", "pizza", "Hawaiian", 5, 0);
+		hawaiian_m = new product("hawaiian_m", "", "pizza", "Hawaiian", 10, 0);
+		hawaiian_l = new product("hawaiian_l", "", "pizza", "Hawaiian", 11, 0);
+		newyork_s = new product("newyork_s", "", "pizza", "New York", 5, 0);
+		newyork_m = new product("newyork_m", "", "pizza", "New York", 10, 0);
+		newyork_l = new product("newyork_l", "", "pizza", "New York", 11, 0);
+		housespecial_s = new product("housespecial_s", "", "pizza", "House Special", 5, 0);
+		housespecial_m = new product("housespecial_m", "", "pizza", "House Special", 10, 0);
+		housespecial_l = new product("housespecial_l", "", "pizza", "House Special", 11, 0);
+		custom_s = new product("custom_s", "", "pizza", "Custom", 5, 0);
+		custom_m = new product("custom_m", "", "pizza", "Custom", 10, 0);
+		custom_l = new product("custom_l", "", "pizza", "Custom", 11, 0);
+		topping = new product("topping", "", "", "", 1, 0);
+		garlicbread = new product("garlicbread", "", "side", "Garlic Bread", 5, 0);
+		wedges = new product("wedges", "", "side", "Potato Wedges", 5, 0);
+		coke = new product("coke", "", "side", "Coca Cola 330ml", 1, 0);
+		sprite = new product("sprite", "", "side", "Sprite 330ml", 1, 0);
+		fanta = new product("fanta", "", "side", "Fanta 330ml", 1, 0);
+		comm = new product("comment", "", "side", "", 0, 0);
 
 		var cart = [];
-		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, meatfeast_l, meatfeast_m, meatfeast_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke);
-		console.log(cart);
+		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, housespecial_l, housespecial_m, housespecial_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke, sprite, fanta, comm);
+
+	$(document).ready(function(){
+	
+	
 	})
 
 	var formValid = false;
@@ -305,87 +314,99 @@
 		validateElements();
 	});
 
-
-    $("select.toppingselect").change(function(){
-        var selectedCountry = $(this).children("option:toppingselect").val();
-        alert("You have selected the country - " + selectedCountry);
-    });
-
 	$('[id=addOrder').click(function(){
-		console.log($("#comments").val());
-        console.log($("input:radio[name=pizza]:checked").val());
-        console.log($("input:radio[name=size]:checked").val());
-        console.log($("#GarlicBread").val());
-        console.log($("#PotatoWedges").val());
-        console.log($("#Coke").val());
-        console.log($("#Fanta").val());
-        console.log($("#Sprite").val());
+		var topp ="";
+		pizza = $("input:radio[name=pizza]:checked").val() + $("input:radio[name=size]:checked").val();
         $('#toppingselect :selected').each(function(i, sel){ 
-    		console.log($(sel).val()); 
+    		topp = topp + $(sel).val() + " ";
+    		topping.qty ++;
 		});
+		$("#toppingselect").val("").selectmenu("refresh");
+		topp = topp + "-"
+		
+		pizza.detail = topp;
+		pizza.qty ++;
 
+		console.log(topp);
+		console.log(pizza);
+        //console.log(cart);
+
+    	var arrayLength = cart.length;
+    	for (var i = 0; i < arrayLength; i++) { // loop over the products
+        	var b = cart[i]; // get one product at a time
+	        //console.log(b.item);
+	        
+	        if(pizza == b.item) {
+	            b.qty ++;
+	            b.detail = b.detail + topp;
+	        }
+	    }
+	    console.log(cart);
 		
 	});
 	
-	
-	$("#btnGet").click(function () {
-    // first get the multiple selected checkbox items
-    var chk = [];
-    $("input:checkbox:checked").each(function() {
-        chk.push($(this).val());
-    });
+	$('[id=updateOrder').click(function(){
+		updateOrder();
+	});
 
-    $("#para").html(
-        $("#txtBox").val() + "<br/>" +
-        $("input:radio[name=rad]:checked").val() + "<br/>" +
-        chk.join(",") + "<br/>" +
-        $("#selectbox").val()
-        );
-});
-
-	$("input[id=pizza1]").click(function(){
-		//alert("clicked");
-		$('input[id^=topping]').prop('checked', false);
-		$("#toppings").show();
-	});
-	$("input[id=pizza2]").click(function(){
-		//alert("clicked");
-		$("#toppings").hide();
-	});
-	$("input[id=pizza3]").click(function(){
-		//alert("clicked");
-		$("#toppings").hide();
-	});
-	$("input[id=pizza4]").click(function(){
-		//alert("clicked");
-		$("#toppings").hide();
-	});
+	function updateOrder(){
+		garlicbread.qty = $("#GarlicBread").val();
+        wedges.qty = $("#PotatoWedges").val();
+        coke.qty = $("#Coke").val();
+        fanta.qty = $("#Fanta").val();
+        sprite.qty = $("#Sprite").val();
+        comm.detail = $("#comments").val();
+        
+        console.log(cart);
+	}
 
 	$("#completeOrder").click(function(){
 		var order =  $("#orderContent").html();
 		alert(order);
 	});
 
-	$("#goBack").click(function(){
-		$("#orderOptions").show();
-		$("#orderDetails").hide();
-	})
+	$("#resetOrder").click(function(){
+		var arrayLength = cart.length;
+    	for (var i = 0; i < arrayLength; i++) { // loop over the products
+        	var b = cart[i]; // get one product at a time
+	        
+	        b.qty = 0;
+	        b.detail = "";
+	    }
+	    console.log(cart);
+	});
+
+
+
 
 	$("#placeOrder").click(function(){
+		$( "#orderDetails" ).panel( "toggle" );
 
-		$("#orderOptions").hide();
-		$("#orderContent").show();
-		$("#orderDetails").show();
 
-		var content = '<h2>Your Order:</h2><br><b>Pizza Topping:</b><br>';
-		
-		var comments = $("#comments").val();
-		
-		var pizza = $("input[name='pizza']").each(function(){
-			if(this.checked == true){
-				content = content + this.value + ":" + this.checked + "<br>";
-			}
-		});
+		updateOrder();
+
+		var content = '<h2>Your Order:</h2><br>';
+		var cost = 0;
+
+		var arrayLength = cart.length-1;
+    	for (var i = 0; i < arrayLength; i++) { // loop over the products
+        	var b = cart[i]; // get one product at a time
+
+        	cost = cost + (b.qty*b.price);
+        	//console.log(cost);
+
+	        if(b.qty > 0 && b.ptype == "pizza") {
+	        	var a = b.item;
+	        	content = content + "<b>Item: </b>"+ b.pname + " <b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + " <b>Toppings:</b> " + b.detail + " <b>Qty:</b> " + b.qty + "<br>";
+	    	}
+	    	else if (b.qty > 0 && b.ptype == "side"){
+	    		content = content + "<b>Item: </b>" + b.pname + " - <b>Qty:</b> " + b.qty + "<br>";
+	    	}
+
+	    }
+
+		var comm = $("#comments").val();
+		content = content + "<br><br> <b>Order Total: </b> €" + cost + "<br>";
 
 		var username = '';
     
@@ -393,13 +414,13 @@
 	      .done(function(data){
 	        username = data; // whatever data comes back, store it in the username variable
 			content = content + "<br><b>Additional Order Comments:</b><br>";
-			content = content + comments + "<br>";
-			content = content + "Thank you for your order " + username;
-			
+			content = content + comm + "<br><br>";
+			content = content + "Please enter your address below " + username + "<br><br>";
+			content = content + "<textarea name='address'id='address'></textarea>";
+			$( "#orderDetails" ).trigger( "updatelayout" );
 			$("#orderContent").html(content);
 		})
 	});
-
 
 	$("#loginButton").click(function(){
 
@@ -411,7 +432,7 @@
 
 		$.post( "/backend", { type: "login", username:un, password:pw})
 		.done(function( data ) {
-		alert( "Data Loaded: " + data );
+		//alert( "Data Loaded: " + data );
 
 		if(data == 'customer'){
 			window.location="/index#customer";
@@ -448,7 +469,7 @@
 
 			$.post("/backend", { type: "register", username:un, password:pw, acctype:at})
 			.done(function(data){
-				alert("Data Loaded: " + data);
+				//alert("Data Loaded: " + data);
 
 				if(data == 'customer'){
 					window.location="/index#customer";
