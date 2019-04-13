@@ -43,8 +43,8 @@
 
 		<div data-role="panel" data-position="right" id="orderDetails" data-display="overlay">
 				<div id="orderContent"></div>
-				<button id='btnGet'>Complete Order</button>
-				<a href="#" data-rel="close">Close panel</a>
+				<button id='placeOrder'>Complete Order</button>
+				<a href="#" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left" data-rel="close">Close</a>
    			 <!-- panel content goes here -->
 			</div><!-- /panel -->
 
@@ -98,22 +98,22 @@
 				
 				<h3>Sides - €5 Each</h3>
 				<label for="side1">Garlic Bread</label>
-				<input type="range" name="GarlicBread" id="GarlicBread" value="0" min="0" max="10">
+				<input type="range" class="slide" name="GarlicBread" id="GarlicBread" value="0" min="0" max="10">
 				<label for="side2">Potato Wedges</label>
-				<input type="range" name="PotatoWedges" id="PotatoWedges" value="0" min="0" max="10">
+				<input type="range"class="slide" name="PotatoWedges" id="PotatoWedges" value="0" min="0" max="10">
 				<h3>Drinks - €1 Each</h3>
 				<label for="drink1">Coke 330ml</label>
-				<input type="range" name="Coke" id="Coke" value="0" min="0" max="10">
+				<input type="range" class="slide"name="Coke" id="Coke" value="0" min="0" max="10">
 				<label for="drink2">Fanta 330ml</label>
-				<input type="range" name="Fanta" id="Fanta" value="0" min="0" max="10">
+				<input type="range" class="slide"name="Fanta" id="Fanta" value="0" min="0" max="10">
 				<label for="drink3">Sprite 330ml</label>
-				<input type="range" name="Sprite" id="Sprite" value="0" min="0" max="10">
-				<button id="updateOrder">Update Order</button>
+				<input type="range" class="slide"name="Sprite" id="Sprite" value="0" min="0" max="10">
+				<!--<button id="updateOrder">Update Order</button>-->
 
 	    		<label for="comments">Comments</label>
 	    		<textarea name="comments" id="comments"></textarea>
-				<button id="placeOrder">Place Order</button>
-				<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
+				<button id="viewCart">View Cart</button>
+				<p><a href="#one" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
 				<button id="resetOrder">Reset Order</button>
 			</div>
 
@@ -256,10 +256,11 @@
 		coke = new product("coke", "", "side", "Coca Cola 330ml", 1, 0);
 		sprite = new product("sprite", "", "side", "Sprite 330ml", 1, 0);
 		fanta = new product("fanta", "", "side", "Fanta 330ml", 1, 0);
-		comm = new product("comment", "", "side", "", 0, 0);
+		comm = new product("comment", "", "info", "", 0, 0);
+		addr = new product("address", "", "info", "", 0, 0);
 
 		var cart = [];
-		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, housespecial_l, housespecial_m, housespecial_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke, sprite, fanta, comm);
+		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, housespecial_l, housespecial_m, housespecial_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke, sprite, fanta, comm, addr);
 
 	$(document).ready(function(){
 	
@@ -314,7 +315,7 @@
 		validateElements();
 	});
 
-	$('[id=addOrder').click(function(){
+	$('#addOrder').click(function(){
 		var topp ="";
 		pizza = $("input:radio[name=pizza]:checked").val() + $("input:radio[name=size]:checked").val();
         $('#toppingselect :selected').each(function(i, sel){ 
@@ -322,15 +323,14 @@
     		topping.qty ++;
 		});
 		$("#toppingselect").val("").selectmenu("refresh");
-		topp = topp + "-"
-		
+		if(topp != ""){
+			topp = topp + "/ ";
+		}	
 		pizza.detail = topp;
 		pizza.qty ++;
-
-		console.log(topp);
-		console.log(pizza);
+		//console.log(topp);
+		//console.log(pizza);
         //console.log(cart);
-
     	var arrayLength = cart.length;
     	for (var i = 0; i < arrayLength; i++) { // loop over the products
         	var b = cart[i]; // get one product at a time
@@ -345,7 +345,7 @@
 		
 	});
 	
-	$('[id=updateOrder').click(function(){
+	$('#updateOrder').click(function(){
 		updateOrder();
 	});
 
@@ -360,83 +360,72 @@
         console.log(cart);
 	}
 
-	$("#completeOrder").click(function(){
-		var order =  $("#orderContent").html();
-		alert(order);
+	$("#placeOrder").click(function(){
+		addr.detail = $("#address").val();
+		console.log(cart);
+		order = JSON.stringify(cart);
+		$.post( "/backend", {type: "placeOrder", details:order})
+	      .done(function(data){
+	        var content = '<h2>Your Order:</h2>';
+			content = content + "<br><b>Your order has been placed!</b><br><br>";
+			$("#placeOrder").hide();
+			$("#orderContent").html(content);
+			$("#orderDetails").trigger("updatelayout");
+		})
+	    console.log(order);
 	});
 
 	$("#resetOrder").click(function(){
 		var arrayLength = cart.length;
     	for (var i = 0; i < arrayLength; i++) { // loop over the products
         	var b = cart[i]; // get one product at a time
-	        
 	        b.qty = 0;
 	        b.detail = "";
 	    }
+	    $(".slide").val(0).slider("refresh");
 	    console.log(cart);
 	});
 
 
-
-
-	$("#placeOrder").click(function(){
+	$("#viewCart").click(function(){
 		$( "#orderDetails" ).panel( "toggle" );
-
-
 		updateOrder();
-
-		var content = '<h2>Your Order:</h2><br>';
+		var content = '<h2>Your Order:</h2>';
 		var cost = 0;
-
 		var arrayLength = cart.length-1;
     	for (var i = 0; i < arrayLength; i++) { // loop over the products
         	var b = cart[i]; // get one product at a time
-
         	cost = cost + (b.qty*b.price);
         	//console.log(cost);
-
 	        if(b.qty > 0 && b.ptype == "pizza") {
 	        	var a = b.item;
-	        	content = content + "<b>Item: </b>"+ b.pname + " <b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + " <b>Toppings:</b> " + b.detail + " <b>Qty:</b> " + b.qty + "<br>";
+	        	content = content + "<b>Pizza: </b>"+ b.pname + "<br><b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + "<br><b>Toppings:</b> " + b.detail.substr(0, b.detail.length-2) + " <b><br>Qty:</b> " + b.qty + "<br><br>";
 	    	}
 	    	else if (b.qty > 0 && b.ptype == "side"){
 	    		content = content + "<b>Item: </b>" + b.pname + " - <b>Qty:</b> " + b.qty + "<br>";
 	    	}
-
 	    }
-
 		var comm = $("#comments").val();
 		content = content + "<br><br> <b>Order Total: </b> €" + cost + "<br>";
-
 		var username = '';
-    
-	    $.post( "/backend", {type: "getusername"})
-	      .done(function(data){
-	        username = data; // whatever data comes back, store it in the username variable
-			content = content + "<br><b>Additional Order Comments:</b><br>";
-			content = content + comm + "<br><br>";
-			content = content + "Please enter your address below " + username + "<br><br>";
-			content = content + "<textarea name='address'id='address'></textarea>";
-			$( "#orderDetails" ).trigger( "updatelayout" );
-			$("#orderContent").html(content);
-		})
+		content = content + "<br><b>Additional Order Comments:</b><br>";
+		content = content + comm + "<br><br>";
+		content = content + "Please enter your address below<br>";
+		content = content + "<textarea name='address'id='address'></textarea>";
+		$( "#orderDetails" ).trigger( "updatelayout" );
+		$("#orderContent").html(content);
 	});
 
 	$("#loginButton").click(function(){
-
 		var un = $("#login_username").val();
-		console.log(un);
-
+		//console.log(un);
 		var pw = $("#login_pass").val();
-		console.log(pw);
-
+		//console.log(pw);
 		$.post( "/backend", { type: "login", username:un, password:pw})
 		.done(function( data ) {
 		//alert( "Data Loaded: " + data );
-
 		if(data == 'customer'){
-			window.location="/index#customer";
-			
+			window.location="/index#customer";	
 		}
 		else if(data == 'driver'){
 			window.location="/index#driver";
@@ -447,11 +436,7 @@
 		else{
 			alert( "Undefined: " + data );
 		}        
-
-		});
-	  
-	  //alert( "login button pressed!" );
-	  
+		});	  
 	});
 
 	$("#registerButton").click(function(){
@@ -459,18 +444,15 @@
 
 		if (formValid == true){
 			var un = $("#email").val();
-			console.log(un);
-
+			//console.log(un);
 			var pw = $("#password").val();
-			console.log(pw);
-
+			//console.log(pw);
 			var at = $("#acctype").val();
-			console.log(at);
+			//console.log(at);
 
 			$.post("/backend", { type: "register", username:un, password:pw, acctype:at})
 			.done(function(data){
 				//alert("Data Loaded: " + data);
-
 				if(data == 'customer'){
 					window.location="/index#customer";
 				}

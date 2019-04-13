@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Login;
+use App\Entity\Orders;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -75,6 +76,32 @@ class Backend extends AbstractController {
             // send back a response, with the username we stored in the session.
             return new Response($session->get('username'));
         }
+        else if($type == 'placeOrder'){
+             // perform order process
+            
+            // get the variables
+            $details = $request->request->get('details', 'none');
+            $placedby = $session->get('username');
+            $status = "Getting Ready";
+                        
+            // put in the database            
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $orders = new Orders();
+            $orders->setDetails($details);
+            $orders->setPlacedby($placedby);
+            $orders->setStatus($status);
+            
+            $entityManager->persist($orders);
+
+            // actually executes the queries (i.e. the INSERT query)
+            $entityManager->flush();             
+                    
+            return new Response(
+                "Order Placed"
+            );
+        }
+
             return new Response(
                 "all ok"
             );
