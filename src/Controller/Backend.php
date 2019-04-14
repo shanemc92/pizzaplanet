@@ -101,6 +101,28 @@ class Backend extends AbstractController {
                 "Order Placed"
             );
         }
+        else if($type == 'statusUpdate'){
+            
+            // get the variables
+            $id = $request->request->get('id', 'none');
+            $status = "Delivered";
+                        
+            // put in the database            
+            $entityManager = $this->getDoctrine()->getManager();            
+
+            $order = $entityManager->getRepository(Orders::class)->find($id); 
+
+    
+            $order->setStatus($status);
+
+            $entityManager->persist($order);
+            $entityManager->flush();
+
+
+            return new Response(
+                "Order Updated"
+            );
+        }
 
             return new Response(
                 "all ok"

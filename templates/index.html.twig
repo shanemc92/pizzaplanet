@@ -301,16 +301,21 @@
 		}
 	});
 
-
 	$('#getOrders').click(function(){
 		$.post( "/viewAll")
 		.done(function(data){
-			//var orders = JSON.parse(data);
 			$("#orders").html(data);
+			//console.log(data);
 		})
-		console.log(data);
 	});
 
+	$(document).on('click', ".updateStatus", function (){
+		var id = $(this).attr("orderid");
+		$.post( "/backend", {type: "statusUpdate", id:id})
+		.done(function(data){
+			//alert("Status Updated");
+		})
+	});
 
 	$('#addOrder').click(function(){
 		var topp ="";

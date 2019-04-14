@@ -55,11 +55,6 @@ class Login
     }
     
     
-    
-    
-    
-    
-    
     public function getId(): ?int
     {
         return $this->id;
