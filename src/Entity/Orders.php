@@ -85,7 +85,7 @@ class Orders
         return $this;
     }
 	
-	public function getCreated(): ?string
+	public function getCreated(): ?object
     {
         return $this->created;
     }

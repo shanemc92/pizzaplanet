@@ -11,6 +11,16 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+		$( function() {
+			$( "#datepicker" ).datepicker();
+			$( "#datepicker2" ).datepicker();
+		} );
+  	</script>
 </head>
 
 <body>
@@ -164,9 +174,14 @@
 		</div><!-- /header -->
 
 		<div role="main" class="ui-content">
-			<h2>Two</h2>
-			<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>
-			<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>
+			<h2>Management Reporting</h2>
+			<h3>Select Dates Below</h3>
+			<p>From Date: <input type="text" id="datepicker"></p>
+			<p>To Date: <input type="text" id="datepicker2"></p>
+			<div id="mgmtinfo"></div>
+			<h2>View Orders</h2>
+			<button class="ui-btn" id="getDateOrders">Load Orders</button>
+			<div id="dateOrders"></div>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
 
 		</div><!-- /content -->
@@ -271,7 +286,7 @@
 		$("#temp").hide();
 
     	$.getJSON("https://api.openweathermap.org/data/2.5/weather?q=Navan&units=metric&appid=caa18169ba6266374cf3aa835afe0933",function(result){
-        	var weather = ("<p>The weather today is "+result.weather[0].description+
+        	var weather = ("<p>The weather today for "+result.name+ " is "+result.weather[0].description+
         		"<br>Temperature is "+(result.main.temp).toFixed(0)+"℃ and the wind speed is "+(result.wind.speed).toFixed(0)+" km/h</p>");
         	$('#weather').html(weather);
         });
@@ -310,16 +325,27 @@
 	});
 
 	$('#getOrders').click(function(){
-		getOrders();
+		getOpenOrders();
 	});
-	function getOrders(){
+	function getOpenOrders(){
 	$.post( "/viewAll")
 		.done(function(data){
 			$("#orders").html(data);
 			//console.log(data);
 		})
 	}
-
+	$('#getDateOrders').click(function(){
+		getDateOrders();
+	});
+	function getDateOrders(){
+	var date1 = $("#datepicker").val();
+	var date2 = $("#datepicker2").val();
+	$.post( "/viewSome", {date1:date1, date2:date2})
+		.done(function(data){
+			$("#dateOrders").html(data);
+			//console.log(data);
+		})
+	}
 
 
 	$(document).on('click', ".updateStatus", function (){
@@ -407,7 +433,6 @@
 	      	.done(function(data){
 	        	placedby.detail = data; // whatever data comes back, store it in the username variable
 				//console.log(cart);
-				order = JSON.stringify(cart);
 				$("#ordercontent").hide();
 				$("#placeOrder").hide();
 				$("#temp").show();

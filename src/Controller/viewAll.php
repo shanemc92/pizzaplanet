@@ -14,7 +14,6 @@ class viewAll extends AbstractController
      * @Route("/viewAll", name="viewall")
      */
     public function index(){
-        
         $entityManager = $this->getDoctrine()->getManager();        
 
         $orders = $this->getDoctrine()->getRepository(Orders::class)->findAll();
@@ -56,5 +55,6 @@ class viewAll extends AbstractController
         return new Response(
             $output
         );
+
     }
 }
