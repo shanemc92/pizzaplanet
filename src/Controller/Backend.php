@@ -105,7 +105,7 @@ class Backend extends AbstractController {
             
             // get the variables
             $id = $request->request->get('id', 'none');
-            $status = "Delivered";
+            $status = "Completed";
                         
             // put in the database            
             $entityManager = $this->getDoctrine()->getManager();            

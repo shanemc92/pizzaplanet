@@ -47,7 +47,7 @@ class viewAll extends AbstractController
                     $output .= '<td>' . $detail[1] . '</td>'; // Address
                     $output .= '<td>' . $detail[2] . '</td>'; // Total
                     $output .= '<td>' . $pro->getStatus() . '</td>';
-                    $output .= '<td><button class="updateStatus ui-btn" orderid="'. $pro->getId() .'">Completed</button></td>';
+                    $output .= '<td><button class="updateStatus ui-btn" orderid="'. $pro->getId() .'">Delivered</button></td>';
                 $output .= '</tr>';    
             }
         }

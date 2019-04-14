@@ -139,6 +139,8 @@
 		</div><!-- /header -->
 
 		<div role="main" class="ui-content">
+			<h2>Weather Forecast</h2>
+			<div id="weather"></div>
 			<h2>Pending Orders</h2>
 			<button class="ui-btn" id="getOrders">Refresh Orders</button>
 			<div id="orders"></div>
@@ -267,7 +269,13 @@
 
 	$(document).ready(function(){
 		$("#temp").hide();
-	})
+
+    	$.getJSON("https://api.openweathermap.org/data/2.5/weather?q=Navan&units=metric&appid=caa18169ba6266374cf3aa835afe0933",function(result){
+        	var weather = ("<p>The weather today is "+result.weather[0].description+
+        		"<br>Temperature is "+(result.main.temp).toFixed(0)+"℃ and the wind speed is "+(result.wind.speed).toFixed(0)+" km/h</p>");
+        	$('#weather').html(weather);
+        });
+	});
 
 	$("#myForm").children().focus(function(){
 		// check email is entered
@@ -302,18 +310,23 @@
 	});
 
 	$('#getOrders').click(function(){
-		$.post( "/viewAll")
+		getOrders();
+	});
+	function getOrders(){
+	$.post( "/viewAll")
 		.done(function(data){
 			$("#orders").html(data);
 			//console.log(data);
 		})
-	});
+	}
+
+
 
 	$(document).on('click', ".updateStatus", function (){
 		var id = $(this).attr("orderid");
 		$.post( "/backend", {type: "statusUpdate", id:id})
 		.done(function(data){
-			//alert("Status Updated");
+			getOrders();
 		})
 	});
 
@@ -369,7 +382,7 @@
         	//console.log(cost);
 	        if(b.qty > 0 && b.ptype == "pizza") {
 	        	var a = b.item;
-	        	order3 = order3 + "<b>Pizza: </b>"+ b.pname + "<br><b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + "<br><b>Toppings:</b> " + b.detail.substr(0, b.detail.length-2) + " <b><br>Qty:</b> " + b.qty + "<br>";
+	        	order3 = order3 + "<b>Pizza: </b>"+ b.pname + "<br><b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + "<br><b>Toppings:</b> " + b.detail.substr(0, b.detail.length-2) + " <b><br>Qty:</b> " + b.qty + "<br>---------<br>";
 	    	}
 	    	else if (b.qty > 0 && b.ptype == "side"){
 	    		order3 = order3 + "<b>Item: </b>" + b.pname + " - <b>Qty:</b> " + b.qty + "<br>";
@@ -377,11 +390,9 @@
 	    }
 		var comm = $("#comments").val();
 		var addr = $("#address").val();
-		order3 = order3 + "<b>Total: </b> €" + cost + "<br>";
-		order3 = order3 + "<b>Comments:</b><br>";
-		order3 = order3 + comm + "<br>";
-		order3 = order3 + "<b>Address:</b><br>";
-		order3 = order3 + addr + "<br>";
+		order3 = order3 + "<b>Comments: </b>"+ comm + "<br>";
+		order3 = order3 + "+=====+"+ addr + "<br>";
+		order3 = order3 + "+=====+€" + cost + "<br>";
 
 		if($("#address").val().length < 20){ //too short
 			error = "<span>Address too short.</span><br>";
@@ -416,6 +427,7 @@
 	});
 
 	$("#refreshCart").click(function(){
+		$("#placeOrder").show();
 		viewCart();
 	});
 
