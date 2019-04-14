@@ -42,10 +42,11 @@
 	<div data-role="page" id="customer" data-theme="a">
 
 		<div data-role="panel" data-position="right" id="orderDetails" data-display="overlay">
-				<div id="orderContent"></div>
+				<div id="ordercontent"></div>
 				<div id="error"></div>
+				<div id="temp"><br><p><img src='/assets/img/ajax-loader.gif' width="100%"></p></div>
 				<button id='placeOrder'>Complete Order</button>
-				<a href="#" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left" data-rel="close">Close</a>
+				<a href="#" id="refreshCart" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left" data-rel="close">Close</a>
    			 <!-- panel content goes here -->
 			</div><!-- /panel -->
 
@@ -138,9 +139,9 @@
 		</div><!-- /header -->
 
 		<div role="main" class="ui-content">
-			<h2>Two</h2>
-			<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>
-			<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>
+			<h2>Pending Orders</h2>
+			<button class="ui-btn" id="getOrders">Refresh Orders</button>
+			<div id="orders"></div>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to homepage</a></p>
 
 		</div><!-- /content -->
@@ -202,8 +203,8 @@
 		<div role="main" class="ui-content">
 			<h2>Register</h2>
 			<form id="myform">
-				<div id="error"></div>
-				Email <input type="text" name="email" id="email" value="">
+				<div id="errors"></div>
+				Username <input type="text" name="email" id="email" value="">
 				Password <input type="password" name="password" id="password" value="">
 				Confirm Password <input type="password" name="password2" id="password2" value="">
 				<!--AccType <input type="text" name="acctype" id="acctype" value="">-->
@@ -259,18 +260,16 @@
 		fanta = new product("fanta", "", "side", "Fanta 330ml", 1, 0);
 		comm = new product("comment", "", "info", "", 0, 0);
 		addr = new product("address", "", "info", "", 0, 0);
+		placedby = new product("placedby", "", "info", "", 0, 0);
 
 		var cart = [];
-		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, housespecial_l, housespecial_m, housespecial_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke, sprite, fanta, comm, addr);
+		cart.push(hawaiian_s, hawaiian_m, hawaiian_l, newyork_l, newyork_m, newyork_s, housespecial_l, housespecial_m, housespecial_s, custom_l, custom_m, custom_s, topping, garlicbread, wedges, coke, sprite, fanta, comm, addr, placedby);
 
 	$(document).ready(function(){
-	
-	
+		$("#temp").hide();
 	})
 
-	var formValid = false;
-
-	function validateElements(){
+	$("#myForm").children().focus(function(){
 		// check email is entered
 		var error = "";
 		// regex pattern
@@ -278,43 +277,40 @@
 
 		if($("#email").val() == ""){ // not valid
 			error = error + "Please enter an email address.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		}
 		else if(re.test(String($("#email").val()).toLowerCase()) !== true){ // incorrect email
 			error = error + "Email not valid.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		}
 		else if($("#password").val() == ""){ // not valid
 			error = error + "Please enter a password.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		} 
 		else if($("#password2").val() == ""){ //not valid
 			error = error + "Please confirm your password.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		}
 		else if($("#password2").val() !== $("#password").val()){ //not valid
 			error = error + "Passwords do not match.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		}
 		else if($("#password").val().length < 8){ //too short
 			error = error + "Password too short.<br>";
-			$("#error").html(error);
-			return false;
+			$("#errors").html(error);
 		}
-		else {
-			formValid = true;
-			return true;
-		}
-	}
-
-	$("#myform").click(function(){
-		validateElements();
 	});
+
+
+	$('#getOrders').click(function(){
+		$.post( "/viewAll")
+		.done(function(data){
+			//var orders = JSON.parse(data);
+			$("#orders").html(data);
+		})
+		console.log(data);
+	});
+
 
 	$('#addOrder').click(function(){
 		var topp ="";
@@ -346,9 +342,7 @@
 		
 	});
 	
-	$('#updateOrder').click(function(){
-		updateOrder();
-	});
+	
 
 	function updateOrder(){
 		garlicbread.qty = $("#GarlicBread").val();
@@ -359,8 +353,31 @@
         comm.detail = $("#comments").val();
         //console.log(cart);
 	}
-
+				
 	$("#placeOrder").click(function(){
+		var order3 ='';
+		var cost = 0;
+		var arrayLength = cart.length-1;
+    	for (var i = 0; i < arrayLength; i++) { // loop over the products
+        	var b = cart[i]; // get one product at a time
+        	cost = cost + (b.qty*b.price);
+        	//console.log(cost);
+	        if(b.qty > 0 && b.ptype == "pizza") {
+	        	var a = b.item;
+	        	order3 = order3 + "<b>Pizza: </b>"+ b.pname + "<br><b>Size:</b> " + a.charAt(a.length-1).toUpperCase() + "<br><b>Toppings:</b> " + b.detail.substr(0, b.detail.length-2) + " <b><br>Qty:</b> " + b.qty + "<br>";
+	    	}
+	    	else if (b.qty > 0 && b.ptype == "side"){
+	    		order3 = order3 + "<b>Item: </b>" + b.pname + " - <b>Qty:</b> " + b.qty + "<br>";
+	    	}
+	    }
+		var comm = $("#comments").val();
+		var addr = $("#address").val();
+		order3 = order3 + "<b>Total: </b> €" + cost + "<br>";
+		order3 = order3 + "<b>Comments:</b><br>";
+		order3 = order3 + comm + "<br>";
+		order3 = order3 + "<b>Address:</b><br>";
+		order3 = order3 + addr + "<br>";
+
 		if($("#address").val().length < 20){ //too short
 			error = "<span>Address too short.</span><br>";
 			$("#error").html(error);
@@ -370,21 +387,38 @@
 			error = "";
 			$("#error").html(error);
 			addr.detail = $("#address").val();
-			//console.log(cart);
-			order = JSON.stringify(cart);
-			$.post( "/backend", {type: "placeOrder", details:order})
-		      .done(function(data){
-		        var content = '<h2>Your Order:</h2>';
-				content = content + "<br><b>Your order has been placed!</b><br><br>";
+			$.post( "/backend", {type: "getusername"})
+	      	.done(function(data){
+	        	placedby.detail = data; // whatever data comes back, store it in the username variable
+				//console.log(cart);
+				order = JSON.stringify(cart);
+				$("#ordercontent").hide();
 				$("#placeOrder").hide();
-				$("#orderContent").html(content);
-				$("#orderDetails").trigger("updatelayout");
-			})
+				$("#temp").show();
+				$.post( "/backend", {type: "placeOrder", details:order3})
+			      .done(function(data){
+			        var content = '<h2>Your Order:</h2>';
+					content = content + "<br><b>Your order has been placed!</b><br><br>";
+					$("#ordercontent").html(content);
+					$("#ordercontent").show();
+					$("#temp").hide();
+					$("#orderDetails").trigger("updatelayout");
+					resetCart();
+				})
 	    	//console.log(order);
+	    	})
 		}
 	});
 
-	$("#resetOrder").click(function(){
+	$("#refreshCart").click(function(){
+		viewCart();
+	});
+
+	$('#resetOrder').click(function(){
+		resetCart();
+	});
+
+	function resetCart(){
 		var arrayLength = cart.length;
     	for (var i = 0; i < arrayLength; i++) { // loop over the products
         	var b = cart[i]; // get one product at a time
@@ -393,11 +427,14 @@
 	    }
 	    $(".slide").val(0).slider("refresh");
 	    //console.log(cart);
-	});
-
+	}
 
 	$("#viewCart").click(function(){
-		$( "#orderDetails" ).panel( "toggle" );
+		viewCart();
+		$("#orderDetails").panel("toggle");
+	});
+
+	function viewCart(){
 		updateOrder();
 		var content = '<h2>Your Order:</h2>';
 		var cost = 0;
@@ -416,14 +453,13 @@
 	    }
 		var comm = $("#comments").val();
 		content = content + "<br><br> <b>Order Total: </b> €" + cost + "<br>";
-		var username = '';
 		content = content + "<br><b>Additional Order Comments:</b><br>";
 		content = content + comm + "<br><br>";
 		content = content + "Please enter your address below<br>";
 		content = content + "<textarea name='address'id='address'></textarea>";
 		$( "#orderDetails" ).trigger( "updatelayout" );
-		$("#orderContent").html(content);
-	});
+		$("#ordercontent").html(content);
+	}
 
 	$("#loginButton").click(function(){
 		var un = $("#login_username").val();
@@ -449,9 +485,7 @@
 	});
 
 	$("#registerButton").click(function(){
-		validateElements();
-
-		if (formValid == true){
+		
 			var un = $("#email").val();
 			//console.log(un);
 			var pw = $("#password").val();
@@ -475,9 +509,6 @@
 					alert("Undefined: " + data);
 				}
 			}) 
-		} else {
-			alert('Issue with validation');
-		}
 	});
 
 </script>
