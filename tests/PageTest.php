@@ -5,44 +5,44 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PageTest extends WebTestCase
 {
-    public function testDoesKyleURLExist()
+    public function doesBackendExist()
     {
         $client = static::createClient();
 
-        $client->request('GET', '/Register');
+        $client->request('GET', '/Backend');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
     }
     
-    
-    
-    public function testContent(){
+   public function doesViewAllExist()
+    {
         $client = static::createClient();
 
-        $client->request('GET', '/lazy');
+        $client->request('GET', '/viewAll');
 
-        $this->assertContains(
-            'page',
-            $client->getResponse()->getContent()
-        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
     }
-    
-    
-    
-    public function testRegisterPage(){
+	public function doesViewCustExist()
+    {
         $client = static::createClient();
 
-        $client->request('GET', '/Register');
+        $client->request('GET', '/viewCust');
 
-        $this->assertContains(
-            'This page is the register page',
-            $client->getResponse()->getContent()
-        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
     }
-    
-    
-    
+	public function doesViewSomeExist()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/viewSome');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+    }
 }
+
 
 

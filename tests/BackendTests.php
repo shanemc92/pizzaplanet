@@ -1,37 +1,19 @@
 <?php
-namespace App\Controller;
+namespace App\Tests;
 
 use PHPUnit\Framework\TestCase;
 
 class BackendTest extends TestCase
 {
-    public function testNumber()
+    public function testRegister()
     {
-        $lucky = new LuckyController();
+        $test = new Backend();
         
         
-        $result = $lucky->getANumber();
+        $result = $test->index(type:'register', username:'test', password:'test', acctype:'test');
        
         
-        $this->assertEquals(55, $result);
+        $this->assertEquals('test', $result);
     }
     
-    
-    public function Login(){
-        
-        // ID of the user account.
-        
-        // when we start, ID is set to 0.
-        $id = 0;
-        
-        $lucky = new LuckyController(); // class under test.
-               
-        $id = $lucky->getUserID();
-          
-        $this->assertEquals(1, $id);
-    }
 }
-
-
-
-
