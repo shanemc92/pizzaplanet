@@ -11,16 +11,7 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<link rel="stylesheet" href="/resources/demos/style.css">
-	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script>
-		$( function() {
-			$( "#datepicker" ).datepicker();
-			$( "#datepicker2" ).datepicker();
-		} );
-  	</script>
+
 </head>
 
 <body>
@@ -82,8 +73,8 @@
 	    		</fieldset>
 
 	    		<div id="toppings">
-					<select name="toppingselect" id="toppingselect" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
-						<label for="toppingselect" class="select">Toppings</label>
+					<select name="toppingselect" id="toppingSelect" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+						<label for="toppingSelect" class="select">Toppings</label>
 					    <option>Additional Toppings</option>
 					    <optgroup label="All Toppings €1 Each">
 					        <option value="Ham">Ham</option>
@@ -176,8 +167,8 @@
 		<div role="main" class="ui-content">
 			<h2>Management Reporting</h2>
 			<h3>Select Dates Below</h3>
-			<p>From Date: <input type="text" id="datepicker"></p>
-			<p>To Date: <input type="text" id="datepicker2"></p>
+			<p>From Date: <input type="date" id="datepicker" ></p>
+			<p>To Date: <input type="date" id="datepicker2"></p>
 			<div id="mgmtinfo"></div>
 			<h2>View Orders</h2>
 			<button class="ui-btn" id="getDateOrders">Load Orders</button>
@@ -337,6 +328,7 @@
 	$('#getDateOrders').click(function(){
 		getDateOrders();
 	});
+
 	function getDateOrders(){
 	var date1 = $("#datepicker").val();
 	var date2 = $("#datepicker2").val();
@@ -347,23 +339,30 @@
 		})
 	}
 
-
 	$(document).on('click', ".updateStatus", function (){
 		var id = $(this).attr("orderid");
-		$.post( "/backend", {type: "statusUpdate", id:id})
+		$.post( "/backend", {type: "statusUpdate", id:id, status:"Completed"})
 		.done(function(data){
 			getOrders();
+		})
+	});
+
+	$(document).on('click', ".cancelOrder", function (){
+		var id = $(this).attr("orderid");
+		$.post( "/backend", {type: "statusUpdate", id:id, status:"Cancelled"})
+		.done(function(data){
+			getDateOrders();
 		})
 	});
 
 	$('#addOrder').click(function(){
 		var topp ="";
 		pizza = $("input:radio[name=pizza]:checked").val() + $("input:radio[name=size]:checked").val();
-        $('#toppingselect :selected').each(function(i, sel){ 
+        $('#toppingSelect :selected').each(function(i, sel){ 
     		topp = topp + $(sel).val() + " ";
     		topping.qty ++;
 		});
-		$("#toppingselect").val("").selectmenu("refresh");
+		//$("#toppingSelect").val("").selectmenu("refresh");
 		if(topp != ""){
 			topp = topp + "/ ";
 		}	
