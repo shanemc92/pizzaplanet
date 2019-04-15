@@ -42,7 +42,7 @@ class Backend extends AbstractController {
             $login->setPassword($password);
             $login->setAcctype($acctype);
             $login->setStatus('active');
-
+            $session->set('username', $username);
             $entityManager->persist($login);
 
             // actually executes the queries (i.e. the INSERT query)

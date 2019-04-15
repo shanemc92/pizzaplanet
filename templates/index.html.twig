@@ -12,6 +12,7 @@
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
+	<style> em { color: red; }</style>
 </head>
 
 <body>
@@ -25,17 +26,17 @@
 		</div><!-- /header -->
 
 		<div role="main" class="ui-content">
-			<h2>Welcome!</h2>
-			<br>
-	        Welcome to the application, login or register.
+			<h2>Greetings Earthlings!</h2>
+			<img src="/assets/img/alien.png" width="20%"><br>
+	        <p>Welcome to the Pizza Planet, the home of out of this world pizza!<br>
+	        If you're a new customer click register and if you're an existing customer choose login below to get started!</p>
 
-			<h3>Show internal pages:</h3>
 			<p><a href="#register" class="ui-btn ui-shadow ui-corner-all">Register</a></p>
 			<p><a href="#login" class="ui-btn ui-shadow ui-corner-all">Login</a></p>
 		</div><!-- /content -->
 
 		<div data-role="footer" data-theme="a">
-			<h4>Page Footer</h4>
+			<h4>PizzaPlanet 2019 - B00107924</h4>
 		</div><!-- /footer -->
 	</div><!-- /page one -->
 
@@ -58,6 +59,9 @@
 			<h1>Customer Page</h1>
 		</div><!-- /header -->
 		<div role="main" class="ui-content">
+			<button id="getCustOrders">View Order History</button>
+			<button id="hideCustOrders">Hide Order History</button>
+			<div id="custOrders"></div>
 			<div id="orderOptions">
 				<h2>Menu</h2>
 				<h3>Pizza</h3>
@@ -120,12 +124,10 @@
 				<button id="resetOrder">Reset Order</button>
 			</div>
 
-			
-
 		</div><!-- /content -->
 	
 		<div data-role="footer">
-			<h4>Page Footer</h4>
+			<h4>PizzaPlanet 2019 - B00107924</h4>
 		</div><!-- /footer -->
 	</div><!-- /page two -->
 
@@ -150,7 +152,7 @@
 		</div><!-- /content -->
 
 		<div data-role="footer">
-			<h4>Page Footer</h4>
+			<h4>PizzaPlanet 2019 - B00107924</h4>
 		</div><!-- /footer -->
 	</div><!-- /page two -->
 
@@ -178,7 +180,7 @@
 		</div><!-- /content -->
 
 		<div data-role="footer">
-			<h4>Page Footer</h4>
+			<h4>PizzaPlanet 2019 - B00107924</h4>
 		</div><!-- /footer -->
 	</div><!-- /page two -->
 
@@ -215,7 +217,7 @@
 				Username <input type="text" name="email" id="email" value="">
 				Password <input type="password" name="password" id="password" value="">
 				Confirm Password <input type="password" name="password2" id="password2" value="">
-				<!--AccType <input type="text" name="acctype" id="acctype" value="">-->
+				<!--
 				<div class="ui-field-contain">
 				    Account Type
 				    <select name="select-custom-21" id="acctype" data-native-menu="false">
@@ -224,7 +226,7 @@
 				        <option value="driver">Driver</option>
 				        <option value="manager">Manager</option>
 				    </select>
-				</div>
+				</div>-->
 				<button class="ui-btn" id="registerButton">Submit</button>
 			</form>
 			<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back</a></p>
@@ -275,6 +277,7 @@
 
 	$(document).ready(function(){
 		$("#temp").hide();
+		$("#hideCustOrders").hide();
 
     	$.getJSON("https://api.openweathermap.org/data/2.5/weather?q=Navan&units=metric&appid=caa18169ba6266374cf3aa835afe0933",function(result){
         	var weather = ("<p>The weather today for "+result.name+ " is "+result.weather[0].description+
@@ -283,11 +286,36 @@
         });
 	});
 
+	$('#getCustOrders').click(function(){
+		getCustOrders();
+		$("#getCustOrders").hide();
+		$("#orderOptions").hide();
+		$("#hideCustOrders").show();
+		$("#custOrders").show();
+	});
+	$('#hideCustOrders').click(function(){
+		$("#getCustOrders").show();
+		$("#orderOptions").show();
+		$("#hideCustOrders").hide();
+		$("#custOrders").hide();
+	});
 	
+	function getCustOrders(){
+		$.post( "/backend", {type: "getusername"})
+	  	.done(function(data){
+			un = data;
+			$.post( "/viewCust", {cust:un})
+			.done(function(data){
+				$("#custOrders").html(data);
+				//console.log(data);
+			})
+		})
+	}
 
 	$('#getOrders').click(function(){
 		getOpenOrders();
 	});
+
 	function getOpenOrders(){
 	$.post( "/viewAll")
 		.done(function(data){
@@ -313,7 +341,7 @@
 		var id = $(this).attr("orderid");
 		$.post( "/backend", {type: "statusUpdate", id:id, status:"Completed"})
 		.done(function(data){
-			getOrders();
+			getOpenOrders();
 		})
 	});
 
@@ -345,16 +373,13 @@
     	for (var i = 0; i < arrayLength; i++) { // loop over the products
         	var b = cart[i]; // get one product at a time
 	        //console.log(b.item);
-	        
 	        if(pizza == b.item) {
 	            b.qty ++;
 	            b.detail = b.detail + topp;
 	        }
 	    }
 	    //console.log(cart);
-		
 	});
-	
 	
 
 	function updateOrder(){
@@ -389,8 +414,8 @@
 		order3 = order3 + "+=====+"+ addr + "<br>";
 		order3 = order3 + "+=====+€" + cost + "<br>";
 
-		if($("#address").val().length < 20){ //too short
-			error = "<span>Address too short.</span><br>";
+		if($("#address").val().length < 15){ //too short
+			error = "<em>Address too short.</em><br>";
 			$("#error").html(error);
 			return false;
 		}
@@ -407,13 +432,15 @@
 				$("#temp").show();
 				$.post( "/backend", {type: "placeOrder", details:order3})
 			      .done(function(data){
-			        var content = '<h2>Your Order:</h2>';
-					content = content + "<br><b>Your order has been placed!</b><br><br>";
-					$("#ordercontent").html(content);
-					$("#ordercontent").show();
-					$("#temp").hide();
-					$("#orderDetails").trigger("updatelayout");
-					resetCart();
+			      	setTimeout(function(){
+				        var content = '<h2>Your Order:</h2>';
+						content = content + "<br><b>Your order has been placed!</b><br><br>";
+						$("#ordercontent").html(content);
+						$("#ordercontent").show();
+						$("#temp").hide();
+						$("#orderDetails").trigger("updatelayout");
+						resetCart();
+					}, 2000);
 				})
 	    	//console.log(order);
 	    	})
@@ -497,7 +524,7 @@
 
 	$("#registerButton").click(function(){
 		
-		var error = "";
+		var error = "<em>";
 		// regex pattern
 		//var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -530,20 +557,21 @@
 			$("#errors").html(error);
 			return false;
 		}
-		if($("#acctype").val().length < 6){ //too short
-			error = error + "Please select an account type.<br>";
-			$("#errors").html(error);
-			return false;
-		}
-		if($error == ""){
+		error += '</em>'
+		//if($("#acctype").val().length < 6){ //too short
+		//	error = error + "Please select an account type.<br>";
+		//	$("#errors").html(error);
+		//	return false;
+		//}
+		if(error == "<em></em>"){
 			var un = $("#email").val();
 			//console.log(un);
 			var pw = $("#password").val();
 			//console.log(pw);
-			var at = $("#acctype").val();
+			//var at = $("#acctype").val();
 			//console.log(at);
 
-			$.post("/backend", { type: "register", username:un, password:pw, acctype:at})
+			$.post("/backend", { type: "register", username:un, password:pw, acctype:"customer"})
 			.done(function(data){
 				//alert("Data Loaded: " + data);
 				if(data == 'customer'){
